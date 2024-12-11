@@ -9,16 +9,11 @@ const apiProxy = createProxyMiddleware({
   followRedirects: true,
   on: {
     proxyReq: (proxyReq, req, res) => {
-      console.log(res.headersSent);
-      try {
+      if (!proxyReq._isRedirect) {
+        // Vercel Edge Network doesn't support zstd
+        // https://vercel.com/docs/edge-network/compression
         proxyReq.setHeader("Accept-Encoding", "gzip, br");
-      } catch {}
-    },
-    proxyRes: (proxyRes, req, res) => {
-      console.log(proxyRes.headers);
-      // if (proxyRes.headers["content-encoding"]) {
-      //   res.setHeader("content-encoding", proxyRes.headers["content-encoding"]);
-      // }
+      }
     },
   },
 });
