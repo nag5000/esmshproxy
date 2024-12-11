@@ -8,10 +8,17 @@ const apiProxy = createProxyMiddleware({
   changeOrigin: true,
   followRedirects: true,
   on: {
+    proxyReq: (proxyReq, req, res) => {
+      console.log(res.headersSent);
+      try {
+        proxyReq.setHeader("Accept-Encoding", "gzip, br");
+      } catch {}
+    },
     proxyRes: (proxyRes, req, res) => {
-      if (proxyRes.headers["content-encoding"]) {
-        res.setHeader("content-encoding", proxyRes.headers["content-encoding"]);
-      }
+      console.log(proxyRes.headers);
+      // if (proxyRes.headers["content-encoding"]) {
+      //   res.setHeader("content-encoding", proxyRes.headers["content-encoding"]);
+      // }
     },
   },
 });
