@@ -1,30 +1,16 @@
 "use strict";
 
-import Fastify from "fastify";
-import proxy from "@fastify/http-proxy";
+import express from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
-const app = Fastify();
-
-app.register(proxy, {
-  upstream: "https://esm.sh",
-  replyOptions: {
-    onResponse: (req, reply, res) => {
-      // handle redirects
-      if (
-        [301, 302, 303, 307].includes(res.statusCode) &&
-        res.headers["location"]
-      ) {
-        reply.redirect(res.headers["location"]);
-      } else {
-        reply.send(res);
-      }
-    },
-  },
+const apiProxy = createProxyMiddleware({
+  target: "https://esm.sh",
+  changeOrigin: true,
+  followRedirects: true,
 });
 
-export default async function handler(req, reply) {
-  await app.ready();
-  app.server.emit("request", req, reply);
-}
+const app = express();
+app.use("/", apiProxy);
+app.listen(process.env.PORT || 3000);
 
-// app.listen({ port: 3000 });
+export default app;
