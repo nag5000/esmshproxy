@@ -7,6 +7,13 @@ const apiProxy = createProxyMiddleware({
   target: "https://esm.sh",
   changeOrigin: true,
   followRedirects: true,
+  on: {
+    proxyRes: (proxyRes, req, res) => {
+      if (proxyRes.headers["content-encoding"]) {
+        res.setHeader("content-encoding", proxyRes.headers["content-encoding"]);
+      }
+    },
+  },
 });
 
 const app = express();
